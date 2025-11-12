@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebOS 11</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+            user-select: none;
+            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Desktop */
+        #desktop {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Desktop icons */
+        .desktop-icon {
+            width: 80px;
+            height: 90px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 5px;
+            position: absolute;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .desktop-icon:hover {
+            transform: scale(1.05);
+        }
+
+        .desktop-icon .icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .desktop-icon .label {
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Taskbar */
+        #taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(38, 38, 38, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        #start-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: #0078d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.2s;
+        }
+
+        #start-button:hover {
+            background: #1986e0;
+        }
+
+        #start-button .icon {
+            font-size: 24px;
+            color: white;
+        }
+
+        #taskbar-apps {
+            display: flex;
+            gap: 5px;
+        }
+
+        .taskbar-app {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .taskbar-app:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .taskbar-app .icon {
+            font-size: 20px;
+            color: #eaeaea;
+        }
+
+        .taskbar-app.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #time-section {
+            position: absolute;
+            right: 20px;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin: 5px;
+        }
+
+        #current-time {
+            font-weight: 600;
+        }
+
+        #current-date {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* Start Menu */
+        #start-menu {
+            position: fixed;
+            bottom: 60px;
+            left: 20px;
+            width: 400px;
+            height: 600px;
+            background: rgba(32, 32, 32, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            color: white;
+            z-index: 999;
+        }
+
+        #start-menu-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0078d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        #user-info h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        #user-info p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .start-menu-section {
+            margin-bottom: 25px;
+        }
+
+        .start-menu-section h4 {
+            margin-bottom: 15px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .start-menu-apps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .start-menu-app {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .start-menu-app:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .start-menu-app .icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .start-menu-app .name {
+            font-size: 11px;
+        }
+
+        /* Windows */
+        .window {
+            position: absolute;
+            background: #f0f0f0;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            min-width: 300;
+            min-height: 200px;
+        }
+
+        .window-header {
+            background: #0078d4;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+
+        .window-title {
+            flex-grow: 1;
+            font-weight: 600;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .window-control {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .window-control.minimize {
+            background: #ffb900;
+        }
+
+        .window-control.maximize {
+            background: #00ff54;
+        }
+
+        .window-control.close {
+            background: #ff3b30;
+        }
+
+        .window-control:hover {
+            transform: scale(1.1);
+        }
+
+        .window-content {
+            padding: 15px;
+            height: calc(100% - 50px);
+            overflow: auto;
+        }
+
+        /* App specific styles */
+        .app-notepad {
+            width: 600px;
+            height: 400px;
+            top: 100px;
+            left: 100px;
+        }
+
+        .app-browser {
+            width: 800px;
+            height: 500px;
+            top: 80px;
+            left: 150px;
+        }
+
+        .app-calculator {
+            width: 300px;
+            height: 400px;
+            top: 120px;
+            left: 200px;
+        }
+
+        .app-sticky {
+            width: 350px;
+            height: 250px;
+            top: 150px;
+            left: 300px;
+        }
+
+        .notepad-area {
+            width: 100%;
+            height: calc(100% - 10px);
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .browser-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .browser-url {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .browser-go {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .browser-content {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background: white;
+            height: calc(100% - 60px);
+        }
+
+        .calculator-display {
+            width: 100%;
+            height: 60px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            height: 50px;
+            background: #e6e6e6;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: #d9d9d9;
+        }
+
+        .calc-btn.operator {
+            background: #f0a500;
+            color: white;
+        }
+
+        .calc-btn.operator:hover {
+            background: #ffad00;
+        }
+
+        .calc-btn.equals {
+            background: #0078d4;
+            color: white;
+        }
+
+        .calc-btn.equals:hover {
+            background: #1986e0;
+        }
+
+        .sticky-content {
+            width: 100%;
+            height: calc(100% - 10px);
+            border: none;
+            outline: none;
+            resize: none;
+            background: #ffeb99;
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        /* Modal for new window prompt */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal h3 {
+            margin-bottom: 15px;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-button.cancel {
+            background: #f0f0f0;
+        }
+
+        .modal-button.confirm {
+            background: #0078d4;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="desktop">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" style="top: 20px; left: 20px;" data-app="notepad">
+            <div class="icon">📝</div>
+            <div class="label">Notepad</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 120px; left: 20px;" data-app="browser">
+            <div class="icon">🌐</div>
+            <div class="label">Web Browser</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 220px; left: 20px;" data-app="calculator">
+            <div class="icon">🧮</div>
+            <div class="label">Calculator</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 320px; left: 20px;" data-app="sticky">
+            <div class="icon">📌</div>
+            <div class="label">Sticky Note</div>
+        </div>
+
+        <!-- Start Menu -->
+        <div id="start-menu">
+            <div id="start-menu-header">
+                <div id="user-avatar">👤</div>
+                <div id="user-info">
+                    <h3>User</h3>
+                    <p>WebOS 11 User</p>
+                </div>
+            </div>
+            
+            <div class="start-menu-section">
+                <h4>Recommended</h4>
+                <div class="start-menu-apps">
+                    <div class="start-menu-app" data-app="notepad">
+                        <div class="icon">📝</div>
+                        <div class="name">Notepad</div>
+                    </div>
+                    <div class="start-menu-app" data-app="sticky">
+                        <div class="icon">📌</div>
+                        <div class="name">Sticky Note</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="start-menu-section">
+                <h4>Applications</h4>
+                <div class="start-menu-apps">
+                    <div class="start-menu-app" data-app="notepad">
+                        <div class="icon">📝</div>
+                        <div class="name">Notepad</div>
+                    </div>
+                    <div class="start-menu-app" data-app="browser">
+                        <div class="icon">🌐</div>
+                        <div class="name">Browser</div>
+                    </div>
+                    <div class="start-menu-app" data-app="calculator">
+                        <div class="icon">🧮</div>
+                        <div class="name">Calculator</div>
+                    </div>
+                    <div class="start-menu-app" data-app="sticky">
+                        <div class="icon">📌</div>
+                        <div class="name">Sticky</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div id="taskbar">
+            <div id="start-button">
+                <div class="icon">⊞</div>
+            </div>
+            
+            <div id="taskbar-apps">
+                <!-- App buttons will be added here dynamically -->
+            </div>
+            
+            <div id="time-section">
+                <div id="current-time">12:00</div>
+                <div id="current-date">Dec 31, 2023</div>
+            </div>
+        </div>
+
+        <!-- Modal for prompts -->
+        <div id="modal-overlay">
+            <div class="modal">
+                <h3 id="modal-title">Enter URL</h3>
+                <input type="text" id="modal-input" placeholder="Type here...">
+                <div class="modal-buttons">
+                    <button class="modal-button cancel" id="modal-cancel">Cancel</button>
+                    <button class="modal-button confirm" id="modal-confirm">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Window manager
+        class WindowManager {
+            constructor() {
+                this.zIndex = 100;
+                this.windows = [];
+                this.taskbarApps = document.getElementById('taskbar-apps');
+                
+                // Bind methods
+                this.createWindow = this.createWindow.bind(this);
+                this.bringToFront = this.bringToFront.bind(this);
+                this.minimizeWindow = this.minimizeWindow.bind(this);
+                this.closeWindow = this.closeWindow.bind(this);
+                this.updateTaskbar = this.updateTaskbar.bind(this);
+            }
+            
+            createWindow(appType, title, content) {
+                // Check if window already exists
+                const existingWindow = this.windows.find(w => w.appType === appType && !w.minimized);
+                if (existingWindow) {
+                    this.bringToFront(existingWindow.element);
+                    return existingWindow;
+                }
+                
+                const windowId = 'window-' + Date.now();
+                const taskId = 'task-' + appType;
+                
+                const window = document.createElement('div');
+                window.className = 'window app-' + appType;
+                window.id = windowId;
+                
+                // Create window header
+                const header = document.createElement('div');
+                header.className = 'window-header';
+                
+                const titleEl = document.createElement('div');
+                titleEl.className = 'window-title';
+                titleEl.textContent = title;
+                
+                const controls = document.createElement('div');
+                controls.className = 'window-controls';
+                
+                const minimizeBtn = document.createElement('div');
+                minimizeBtn.className = 'window-control minimize';
+                minimizeBtn.addEventListener('click', () => this.minimizeWindow(windowId));
+                
+                const maximizeBtn = document.createElement('div');
+                maximizeBtn.className = 'window-control maximize';
+                maximizeBtn.addEventListener('click', () => this.maximizeWindow(windowId));
+                
+                const closeBtn = document.createElement('div');
+                closeBtn.className = 'window-control close';
+                closeBtn.addEventListener('click', () => this.closeWindow(windowId));
+                
+                controls.appendChild(minimizeBtn);
+                controls.appendChild(maximizeBtn);
+                controls.appendChild(closeBtn);
+                
+                header.appendChild(titleEl);
+                header.appendChild(controls);
+                
+                // Create window content
+                const contentEl = document.createElement('div');
+                contentEl.className = 'window-content';
+                contentEl.innerHTML = content;
+                
+                window.appendChild(header);
+                window.appendChild(contentEl);
+                
+                // Add to desktop
+                document.getElementById('desktop').appendChild(window);
+                
+                // Make draggable
+                this.makeDraggable(window);
+                
+                // Create taskbar entry
+                const taskbarApp = document.createElement('div');
+                taskbarApp.className = 'taskbar-app active';
+                taskbarApp.id = taskId;
+                taskbarApp.setAttribute('data-app', appType);
+                
+                const taskIcon = document.createElement('div');
+                taskIcon.className = 'icon';
+                taskIcon.textContent = this.getAppIcon(appType);
+                
+                taskbarApp.appendChild(taskIcon);
+                taskbarApp.addEventListener('click', () => this.toggleWindow(windowId, appType));
+                
+                this.taskbarApps.appendChild(taskbarApp);
+                
+                // Store window info
+                const windowInfo = {
+                    id: windowId,
+                    appType: appType,
+                    element: window,
+                    taskbarApp: taskbarApp,
+                    minimized: false,
+                    maximized: false
+                };
+                
+                this.windows.push(windowInfo);
+                this.bringToFront(window);
+                
+                return windowInfo;
+            }
+            
+            getAppIcon(appType) {
+                const icons = {
+                    'notepad': '📝',
+                    'browser': '🌐',
+                    'calculator': '🧮',
+                    'sticky': '📌'
+                };
+                return icons[appType] || '📄';
+            }
+            
+            bringToFront(windowElement) {
+                if (typeof windowElement === 'string') {
+                    windowElement = document.getElementById(windowElement);
+                }
+                
+                this.zIndex++;
+                windowElement.style.zIndex = this.zIndex;
+                
+                // Update taskbar highlighting
+                this.windows.forEach(w => {
+                    if (w.element === windowElement) {
+                        w.taskbarApp.classList.add('active');
+                    } else {
+                        w.taskbarApp.classList.remove('active');
+                    }
+                });
+            }
+            
+            minimizeWindow(windowId) {
+                const windowInfo = this.windows.find(w => w.id === windowId);
+                if (windowInfo) {
+                    windowInfo.element.style.display = 'none';
+                    windowInfo.minimized = true;
+                    windowInfo.taskbarApp.classList.remove('active');
+                }
+            }
+            
+            maximizeWindow(windowId) {
+                const windowInfo = this.windows.find(w => w.id === windowId);
+                if (windowInfo) {
+                    if (windowInfo.maximized) {
+                        windowInfo.element.style.width = windowInfo.savedWidth || '600px';
+                        windowInfo.element.style.height = windowInfo.savedHeight || '400px';
+                        windowInfo.element.style.top = windowInfo.savedTop || '100px';
+                        windowInfo.element.style.left = windowInfo.savedLeft || '100px';
+                        windowInfo.maximized = false;
+                    } else {
+                        windowInfo.savedWidth = windowInfo.element.style.width;
+                        windowInfo.savedHeight = windowInfo.element.style.height;
+                        windowInfo.savedTop = windowInfo.element.style.top;
+                        windowInfo.savedLeft = windowInfo.element.style.left;
+                        
+                        windowInfo.element.style.width = '95vw';
+                        windowInfo.element.style.height = '85vh';
+                        windowInfo.element.style.top = '10px';
+                        windowInfo.element.style.left = '2.5vw';
+                        windowInfo.maximized = true;
+                    }
+                }
+            }
+            
+            closeWindow(windowId) {
+                const windowIndex = this.windows.findIndex(w => w.id === windowId);
+                if (windowIndex !== -1) {
+                    const windowInfo = this.windows[windowIndex];
+                    
+                    // Remove window element
+                    windowInfo.element.remove();
+                    
+                    // Remove taskbar app
+                    windowInfo.taskbarApp.remove();
+                    
+                    // Remove from array
+                    this.windows.splice(windowIndex, 1);
+                }
+            }
+            
+            toggleWindow(windowId, appType) {
+                const windowInfo = this.windows.find(w => w.id === windowId);
+                if (windowInfo) {
+                    if (windowInfo.minimized) {
+                        windowInfo.element.style.display = 'block';
+                        windowInfo.minimized = false;
+                        this.bringToFront(windowInfo.element);
+                    } else {
+                        this.bringToFront(windowInfo.element);
+                    }
+                } else {
+                    // Window doesn't exist, create it based on app type
+                    this.launchApp(appType);
+                }
+            }
+            
+            makeDraggable(element) {
+                const header = element.querySelector('.window-header');
+                let isDragging = false;
+                let currentX;
+                let currentY;
+                let initialX;
+                let initialY;
+                let xOffset = 0;
+                let yOffset = 0;
+                
+                header.addEventListener('mousedown', dragStart);
+                document.addEventListener('mousemove', dragMove);
+                document.addEventListener('mouseup', dragEnd);
+                
+                function dragStart(e) {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                    
+                    if (e.target === header || header.contains(e.target)) {
+                        isDragging = true;
+                        element.style.userSelect = 'none';
+                        element.style.zIndex = this.windowManager ? this.windowManager.zIndex++ : 100;
+                    }
+                }
+                
+                function dragMove(e) {
+                    if (isDragging) {
+                        e.preventDefault();
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                        
+                        xOffset = currentX;
+                        yOffset = currentY;
+                        
+                        element.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                    }
+                }
+                
+                function dragEnd() {
+                    isDragging = false;
+                    
+                    const transform = element.style.transform;
+                    const matrix = new WebKitCSSMatrix(transform);
+                    
+                    xOffset = matrix.m41;
+                    yOffset = matrix.m42;
+                    
+                    element.style.transform = 'none';
+                    element.style.left = (parseInt(element.style.left || '100px') + xOffset) + 'px';
+                    element.style.top = (parseInt(element.style.top || '100px') + yOffset) + 'px';
+                }
+            }
+            
+            launchApp(appType) {
+                let title, content;
+                
+                switch (appType) {
+                    case 'notepad':
+                        title = 'Notepad';
+                        content = '<textarea class="notepad-area" placeholder="Enter text here..."></textarea>';
+                        break;
+                    case 'browser':
+                        title = 'Web Browser';
+                        content = `
+                            <div class="browser-header">
+                                <input type="text" class="browser-url" placeholder="Enter URL">
+                                <button class="browser-go">Go</button>
+                            </div>
+                            <div class="browser-content">
+                                <h2>Welcome to WebOS Browser</h2>
+                                <p>This is a demonstration browser. In a real implementation, this would load external websites.</p>
+                                <ul>
+                                    <li>Try typing "example.com" and clicking Go</li>
+                                    <li>This is just a demo, so no actual browsing will occur</li>
+                                    <li>The interface mimics a real web browser</li>
+                                </ul>
+                            </div>
+                        `;
+                        break;
+                    case 'calculator':
+                        title = 'Calculator';
+                        content = `
+                            <input type="text" class="calculator-display" id="calc-display" readonly>
+                            <div class="calculator-buttons">
+                                <button class="calc-btn" onclick="calcClear()">C</button>
+                                <button class="calc-btn" onclick="calcDelete()">⌫</button>
+                                <button class="calc-btn operator" onclick="calcInput('(')">(</button>
+                                <button class="calc-btn operator" onclick="calcInput(')')">)</button>
+                                
+                                <button class="calc-btn" onclick="calcInput('7')">7</button>
+                                <button class="calc-btn" onclick="calcInput('8')">8</button>
+                                <button class="calc-btn" onclick="calcInput('9')">9</button>
+                                <button class="calc-btn operator" onclick="calcInput('/')">÷</button>
+                                
+                                <button class="calc-btn" onclick="calcInput('4')">4</button>
+                                <button class="calc-btn" onclick="calcInput('5')">5</button>
+                                <button class="calc-btn" onclick="calcInput('6')">6</button>
+                                <button class="calc-btn operator" onclick="calcInput('*')">×</button>
+                                
+                                <button class="calc-btn" onclick="calcInput('1')">1</button>
+                                <button class="calc-btn" onclick="calcInput('2')">2</button>
+                                <button class="calc-btn" onclick="calcInput('3')">3</button>
+                                <button class="calc-btn operator" onclick="calcInput('-')">−</button>
+                                
+                                <button class="calc-btn" onclick="calcInput('0')">0</button>
+                                <button class="calc-btn" onclick="calcInput('.')">.</button>
+                                <button class="calc-btn equals" onclick="calcEquals()">=</button>
+                                <button class="calc-btn operator" onclick="calcInput('+')">+</button>
+                            </div>
+                        `;
+                        break;
+                    case 'sticky':
+                        title = 'Sticky Note';
+                        content = '<textarea class="sticky-content" placeholder="Write your note here..."></textarea>';
+                        break;
+                    default:
+                        return;
+                }
+                
+                this.createWindow(appType, title, content);
+            }
+            
+            updateTaskbar() {
+                // Update taskbar app highlights based on active window
+                const activeWindow = this.windows.find(w => !w.minimized);
+                this.windows.forEach(w => {
+                    if (w === activeWindow) {
+                        w.taskbarApp.classList.add('active');
+                    } else {
+                        w.taskbarApp.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        // Global window manager instance
+        const windowManager = new WindowManager();
+        
+        // App launchers
+        function launchApp(appType) {
+            windowManager.launchApp(appType);
+        }
+        
+        // Calculator functions
+        let calcDisplay = null;
+        
+        function calcInit() {
+            calcDisplay = document.getElementById('calc-display');
+        }
+        
+        function calcInput(value) {
+            if (!calcDisplay) calcInit();
+            calcDisplay.value += value;
+        }
+        
+        function calcClear() {
+            if (!calcDisplay) calcInit();
+            calcDisplay.value = '';
+        }
+        
+        function calcDelete() {
+            if (!calcDisplay) calcInit();
+            calcDisplay.value = calcDisplay.value.slice(0, -1);
+        }
+        
+        function calcEquals() {
+            if (!calcDisplay) calcInit();
+            try {
+                // Replace display operators with JavaScript equivalents
+                let expression = calcDisplay.value
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/−/g, '-');
+                
+                calcDisplay.value = eval(expression);
+            } catch (error) {
+                calcDisplay.value = 'Error';
+            }
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start button
+            document.getElementById('start-button').addEventListener('click', function() {
+                const startMenu = document.getElementById('start-menu');
+                startMenu.style.display = startMenu.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Click outside start menu to close it
+            document.addEventListener('click', function(e) {
+                const startMenu = document.getElementById('start-menu');
+                const startButton = document.getElementById('start-button');
+                
+                if (!startMenu.contains(e.target) && !startButton.contains(e.target)) {
+                    startMenu.style.display = 'none';
+                }
+            });
+            
+            // Desktop icon clicks
+            document.querySelectorAll('.desktop-icon').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const appType = this.getAttribute('data-app');
+                    launchApp(appType);
+                    document.getElementById('start-menu').style.display = 'none';
+                });
+            });
+            
+            // Start menu app clicks
+            document.querySelectorAll('.start-menu-app').forEach(app => {
+                app.addEventListener('click', function() {
+                    const appType = this.getAttribute('data-app');
+                    launchApp(appType);
+                    document.getElementById('start-menu').style.display = 'none';
+                });
+            });
+            
+            // Browser Go button
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('browser-go')) {
+                    const urlInput = e.target.parentElement.querySelector('.browser-url');
+                    const contentArea = e.target.parentElement.nextElementSibling;
+                    
+                    if (urlInput.value.trim()) {
+                        contentArea.innerHTML = `
+                            <div style="text-align: center; padding: 40px;">
+                                <h2>Loading...</h2>
+                                <p>Loading ${urlInput.value}...</p>
+                                <div style="margin-top: 20px;">
+                                    <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #0078d4; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                                </div>
+                            </div>
+                            <style>
+                                @keyframes spin {
+                                    0% { transform: rotate(0deg); }
+                                    100% { transform: rotate(360deg); }
+                                }
+                            </style>
+                        `;
+                        
+                        setTimeout(() => {
+                            contentArea.innerHTML = `
+                                <h2>WebOS Demo Browser</h2>
+                                <p>You searched for: <strong>${urlInput.value}</strong></p>
+                                <p>This is a demonstration browser that doesn't actually load external websites.</p>
+                                <p>In a real implementation, this would load the actual website content.</p>
+                            `;
+                        }, 1500);
+                    }
+                }
+            });
+            
+            // Modal functionality
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalInput = document.getElementById('modal-input');
+            const modalCancel = document.getElementById('modal-cancel');
+            const modalConfirm = document.getElementById('modal-confirm');
+            let modalCallback = null;
+            
+            function showModal(title, placeholder, callback) {
+                document.getElementById('modal-title').textContent = title;
+                modalInput.placeholder = placeholder;
+                modalInput.value = '';
+                modalOverlay.style.display = 'flex';
+                modalCallback = callback;
+                modalInput.focus();
+            }
+            
+            modalCancel.addEventListener('click', function() {
+                modalOverlay.style.display = 'none';
+                if (modalCallback) modalCallback(null);
+            });
+            
+            modalConfirm.addEventListener('click', function() {
+                modalOverlay.style.display = 'none';
+                if (modalCallback) modalCallback(modalInput.value);
+            });
+            
+            // Time updates
+            function updateTime() {
+                const now = new Date();
+                const timeEl = document.getElementById('current-time');
+                const dateEl = document.getElementById('current-date');
+                
+                // Format time (12-hour with AM/PM)
+                const hours = now.getHours();
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const displayHours = hours % 12 || 12;
+                
+                timeEl.textContent = `${displayHours}:${minutes} ${ampm}`;
+                
+                // Format date
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                dateEl.textContent = now.toLocaleDateString('en-US', options);
+            }
+            
+            updateTime();
+            setInterval(updateTime, 60000); // Update every minute
+            
+            // Initialize calculator if present
+            if (document.getElementById('calc-display')) {
+                calcInit();
+            }
+        });
+        
+        // Make sure calculator functions are global
+        window.calcInput = calcInput;
+        window.calcClear = calcClear;
+        window.calcDelete = calcDelete;
+        window.calcEquals = calcEquals;
+    </script>
+</body>
+</html>
